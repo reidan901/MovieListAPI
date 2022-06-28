@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MovieListAPI.Repositories;
 
 namespace MovieListAPI
 {
@@ -51,6 +52,8 @@ namespace MovieListAPI
             services
                 .AddDbContext<AppDbContext>(options => options
                     .UseSqlServer(Configuration.GetConnectionString("DBConnection")));
+
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
     }

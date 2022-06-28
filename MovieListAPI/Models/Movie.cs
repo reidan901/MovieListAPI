@@ -4,6 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieListAPI.Models
 {
+
+    public enum MovieCategories
+    {
+        Action,
+        Horror,
+        Comedy,
+        Thriller,
+        All
+    }
     public class Movie :BaseEntity
     {
         [Required]
@@ -13,8 +22,8 @@ namespace MovieListAPI.Models
         [MaxLength(1000)]
         public string Description { get; set; }
         [Required]
-        [MaxLength(100)]
-        public string Category { get; set; }
+        [Column(TypeName = "nvarchar(24)")]
+        public MovieCategories Category { get; set; }
         [Column(TypeName = "decimal(1)")]
         public decimal Rating { get; set; }
 

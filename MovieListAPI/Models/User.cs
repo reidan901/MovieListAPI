@@ -1,8 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieListAPI.Models
 {
+
+    public enum UserRole
+    {
+        Admin,
+        NormalUser
+    }
     [Index(nameof(Username), IsUnique = true)]
     public class User : BaseEntity
     {
@@ -13,6 +20,10 @@ namespace MovieListAPI.Models
         [Required]
         [MaxLength(50)]
         public string Password { get; set; }
+
+        [Column(TypeName = "nvarchar(24)")]
+        [Required]
+        public UserRole role { get; set; }
 
         [Required]
         public string ImageName { get; set; }
