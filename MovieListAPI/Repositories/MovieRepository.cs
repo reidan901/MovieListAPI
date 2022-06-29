@@ -22,12 +22,17 @@ namespace MovieListAPI.Repositories
 
         public async Task<IEnumerable<Movie>> GetMoviesAsync()
         {
-            return await _context.Movies.ToListAsync();
+            return await _context.Movies
+                .Include(m => m.Reviews)
+                .Where(movie => movie.DeletedAt == null)
+                .ToListAsync();
         }
 
         public async Task<Movie> GetMovieByIDAsync(Guid reviewID)
         {
-            return await _context.Movies.FirstOrDefaultAsync(e => e.Id == reviewID);
+            return await _context.Movies?
+                .Include(m=> m.Reviews)
+                .FirstOrDefaultAsync(e => e.Id == reviewID);
         }
 
         public async Task InsertMovieAsync(Movie movie)

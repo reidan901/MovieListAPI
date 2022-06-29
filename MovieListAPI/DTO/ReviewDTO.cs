@@ -14,4 +14,15 @@
     {
         public Guid ReviewId { get; set; }
     }
+
+    public class UpdateReviewDTO
+    {
+        public Guid ReviewID { get; set; }
+
+        public Guid MovieID { get; set; }
+
+        public string Description { get; set; }
+
+        public float Rating { get; set; }
+    }
 }

@@ -50,7 +50,7 @@ namespace MovieListAPI.DTO
                 Category = movie.Category.ToString(),
                 Rating = movie.Rating,
                 Name = movie.Name,
-                Reviews = (List<SendReviewDTO>)movie.Reviews?.Select(movie => movie.AsDto())
+                Reviews = movie.Reviews?.Select(movie => movie.AsDto()).ToList()
             };
         }
     }

@@ -29,15 +29,17 @@ namespace MovieListAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{id:int}")]
+        [Route("{movieID}")]
         [Authorize(Roles = "NormalUser,Admin")]
-        public async Task<SendMovieDTO> GetMoviesByID([FromForm] Guid movieID)
+        public async Task<ActionResult<SendMovieDTO>> GetMoviesByID(Guid movieID)
         {
+            if (await unitOfWork.MovieRepository.GetMovieByIDAsync(movieID) == null)
+                return NotFound("No movie exists with that ID.");
             return (await unitOfWork.MovieRepository.GetMovieByIDAsync(movieID)).AsDto();
         }
 
         [HttpPost]
-        [Authorize(Roles = "NormalUser,Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddMovie([FromForm] MovieDTO movie)
         {
             try
