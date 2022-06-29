@@ -4,12 +4,25 @@ namespace MovieListAPI.DTO
 {
     public static class Extensions
     {
-        public static UserAsNormalDTO AsDto(this User user)
+        public static UserNormalAcessDTO AsDtoNormal(this User user)
         {
-            return new UserAsNormalDTO
+            return new UserNormalAcessDTO
             {
                 id = user.Id,
                 Username = user.Username,
+                ImageName = user.ImageName,
+                role = user.role.ToString(),
+                Reviews = user.Reviews
+            };
+        }
+
+        public static UserAdminAcessDTO AsDtoAdmin(this User user)
+        {
+            return new UserAdminAcessDTO
+            {
+                id = user.Id,
+                Username = user.Username,
+                Password = user.Password,
                 ImageName = user.ImageName,
                 role = user.role.ToString(),
                 Reviews = user.Reviews

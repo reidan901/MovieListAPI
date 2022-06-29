@@ -12,8 +12,8 @@ using MovieListAPI;
 namespace MovieListAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220625143829_migration2")]
-    partial class migration2
+    [Migration("20220628111239_migration1")]
+    partial class migration1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

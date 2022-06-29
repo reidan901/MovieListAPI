@@ -11,6 +11,7 @@ namespace MovieListAPI.Models
         NormalUser
     }
     [Index(nameof(Username), IsUnique = true)]
+    [Index(nameof(ImageName), IsUnique = true)]
     public class User : BaseEntity
     {
         [Required]

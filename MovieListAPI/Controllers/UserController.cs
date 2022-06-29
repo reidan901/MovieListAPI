@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MovieListAPI.DTO;
 using MovieListAPI.Repositories;
@@ -9,43 +10,50 @@ namespace MovieListAPI.Controllers
     [Route("users")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository userRepository;
+        private readonly IUnitOfWork unitOfWork;
+        private readonly IConfiguration _config;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUnitOfWork uOF, IConfiguration config)
         {
-            this.userRepository = userRepository;
+            unitOfWork = uOF;
+            _config = config;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<UserAsNormalDTO>> GetUsers()
+        [Authorize(Roles = "NormalUser,Admin")]
+        public async Task<IEnumerable<UserNormalAcessDTO>> GetUsersNormalEndpoint()
         {
-            return (await userRepository.GetUsersAsync()).Select(user => user.AsDto());
+            return (await unitOfWork.UserRepository.GetUsersAsync()).Select(user => user.AsDtoNormal());
         }
 
-        [HttpPost]
-        public async Task<ActionResult> AddUser([FromForm]CreateUserNormalDTO user)
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IEnumerable<UserAdminAcessDTO>> GetUsersAdminEndpoint()
+        {
+            return (await unitOfWork.UserRepository.GetUsersAsync()).Select(user => user.AsDtoAdmin());
+        }
+
+        [HttpPatch]
+        [Authorize(Roles = "NormalUser,Admin")]
+        public async Task<ActionResult> UpdateUserNormalEndpoint([FromForm] UpdateUserNormalDTO newUser)
         {
             try
             {
-                if (user == null)
-                    return BadRequest();
-                string workingDirectory = Environment.CurrentDirectory + "\\Upload\\" + user.Image.FileName;
+                var existingUser = await unitOfWork.UserRepository.GetUserByIDAsync(newUser.UserId);
+                if (existingUser == null)
+                    return NotFound("User doesn't exist in the database.");
+                string workingDirectory = Environment.CurrentDirectory + "\\Upload\\" + newUser.Image.FileName;
+                System.IO.File.Delete(Environment.CurrentDirectory + "\\Upload\\" + existingUser.ImageName);
+                existingUser.Username = newUser.Username;
+                existingUser.Password = newUser.Password;
+                existingUser.ImageName = newUser.Image.FileName;
+                await unitOfWork.UserRepository.UpdateUserAsync(existingUser);
                 using (Stream fileStream = new FileStream(workingDirectory, FileMode.Create))
                 {
-                    await user.Image.CopyToAsync(fileStream);
+                    await newUser.Image.CopyToAsync(fileStream);
                 }
-
-                await userRepository.InsertUserAsync(new Models.User
-                {
-                    Username = user.Username,
-                    Password = user.Password,
-                    role = Models.UserRole.NormalUser,
-                    ImageName = user.Image.FileName,
-                    Id = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow
-                });
-
-                return StatusCode(201);
+                await unitOfWork.SaveChangesAsync();
+                return Ok($"User: {newUser.UserId} succesfully updated.");
             }catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);

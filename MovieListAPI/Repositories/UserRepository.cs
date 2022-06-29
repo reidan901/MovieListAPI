@@ -9,10 +9,11 @@ namespace MovieListAPI.Repositories
         Task InsertUserAsync(User user);
         Task DeleteUserAsync(Guid userID);
         Task UpdateUserAsync(User user);
+        Task<User> GetUserByUserNameAsync(string name);
     }
     public class UserRepository:IUserRepository
     {
-        AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public UserRepository(AppDbContext context)
         {
@@ -32,7 +33,6 @@ namespace MovieListAPI.Repositories
         public async Task InsertUserAsync(User user)
         {
             _context.Users.AddAsync(user);
-            _context.SaveChangesAsync();
             await Task.CompletedTask;
         }
 
@@ -48,7 +48,6 @@ namespace MovieListAPI.Repositories
                 itemToUpdate.role = user.role;
                 itemToUpdate.ImageName=user.ImageName;
 
-                await _context.SaveChangesAsync();
             }
         }
 
@@ -57,7 +56,11 @@ namespace MovieListAPI.Repositories
             var item = await _context.Users.FirstOrDefaultAsync(us => us.Id == userID);
             if (item != null)
                 item.DeletedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+        }
+
+        public async Task<User> GetUserByUserNameAsync(string name)
+        {
+            return await _context.Users.FirstOrDefaultAsync(us => us.Username==name);
         }
     }
 }
