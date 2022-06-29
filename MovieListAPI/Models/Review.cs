@@ -11,8 +11,7 @@ namespace MovieListAPI.Models
         public string Description { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(1)")]
-        public decimal Rating { get; set; }
+        public float Rating { get; set; }
 
         public Guid UserID { get; set; }
 

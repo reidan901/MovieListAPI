@@ -28,6 +28,12 @@ namespace MovieListAPI.Controllers
                 var user = await unitOfWork.UserRepository.GetUserByIDAsync(review.UserID);
                 if (user == null)
                     return BadRequest("No users exist with provided ID.");
+                var movie = await unitOfWork.MovieRepository.GetMovieByIDAsync(review.MovieID);
+                if(movie.Reviews!=null)
+                {
+                    movie.Rating = (movie.Reviews.Count() * movie.Rating + review.Rating) / movie.Reviews.Count() + 1;
+                    await unitOfWork.MovieRepository.UpdateMovieAsync(movie);
+                }
                 var newReview = new Review
                 {
                     Id = Guid.NewGuid(),

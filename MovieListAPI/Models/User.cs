@@ -26,8 +26,7 @@ namespace MovieListAPI.Models
         [Required]
         public UserRole role { get; set; }
 
-        [Required]
-        public string ImageName { get; set; }
+        public string? ImageName { get; set; }
 
         public List<Review>? Reviews { get; set; }
     }

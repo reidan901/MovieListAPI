@@ -10,8 +10,7 @@ namespace MovieListAPI.Models
         Action,
         Horror,
         Comedy,
-        Thriller,
-        All
+        Thriller
     }
     public class Movie :BaseEntity
     {
@@ -24,8 +23,7 @@ namespace MovieListAPI.Models
         [Required]
         [Column(TypeName = "nvarchar(24)")]
         public MovieCategories Category { get; set; }
-        [Column(TypeName = "decimal(1)")]
-        public decimal Rating { get; set; }
+        public float Rating { get; set; }
 
         public List<Review>? Reviews { get; set; }
     }

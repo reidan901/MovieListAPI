@@ -4,6 +4,8 @@
     {
         IUserRepository UserRepository { get; }
         IReviewRepository ReviewRepository { get; }
+
+        IMovieRepository MovieRepository { get; }
         public Task<bool> SaveChangesAsync();
     }
     public class UnitOfWork:IUnitOfWork
@@ -12,13 +14,17 @@
         public IUserRepository UserRepository { get; set; }
         public IReviewRepository ReviewRepository { get; set; }
 
+        public IMovieRepository MovieRepository { get; set; }
+
         public UnitOfWork ( AppDbContext efDbContext, 
             IUserRepository users,
-            IReviewRepository reviews)
+            IReviewRepository reviews,
+            IMovieRepository movies)
         {
             UserRepository = users;
             _context = efDbContext;
             ReviewRepository = reviews;
+            MovieRepository = movies;
         }
 
         public async Task<bool> SaveChangesAsync()

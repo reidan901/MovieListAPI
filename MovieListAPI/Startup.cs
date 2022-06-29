@@ -59,6 +59,7 @@ namespace MovieListAPI
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<IMovieRepository, MovieRepository>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {

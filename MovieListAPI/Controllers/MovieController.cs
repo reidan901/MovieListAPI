@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MovieListAPI.DTO;
+using MovieListAPI.Models;
 using MovieListAPI.Repositories;
 
 namespace MovieListAPI.Controllers
 {
-    public class MovieController
+    [ApiController]
+    [Route("movie")]
+    public class MovieController : ControllerBase
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IConfiguration _config;
@@ -15,25 +19,58 @@ namespace MovieListAPI.Controllers
             _config = config;
         }
 
+        [HttpGet]
+        [Authorize(Roles = "NormalUser,Admin")]
+        public async Task<IEnumerable<SendMovieDTO>> GetMovies()
+        {
+            var list1 = (await unitOfWork.MovieRepository.GetMoviesAsync());
+            var list = list1.Select(movie => movie.AsDto());
+            return list;
+        }
+
+        [HttpGet]
+        [Route("{id:int}")]
+        [Authorize(Roles = "NormalUser,Admin")]
+        public async Task<SendMovieDTO> GetMoviesByID([FromForm] Guid movieID)
+        {
+            return (await unitOfWork.MovieRepository.GetMovieByIDAsync(movieID)).AsDto();
+        }
+
         [HttpPost]
         [Authorize(Roles = "NormalUser,Admin")]
-        public async Task<ActionResult> AddReview([FromForm] ReviewDTO review)
+        public async Task<ActionResult> AddMovie([FromForm] MovieDTO movie)
         {
             try
             {
-                var user = await unitOfWork.UserRepository.GetUserByIDAsync(review.UserID);
-                if (user == null)
-                    return BadRequest("No users exist with provided ID.");
-                var newReview = new Review
+                MovieCategories category;
+                switch(movie.Category)
+                {
+                    case "Horror":
+                        category = MovieCategories.Horror;
+                        break;
+                    case "Action":
+                        category = MovieCategories.Action;
+                        break;
+                    case "Comedy":
+                        category = MovieCategories.Comedy;
+                        break;
+                    case "Thriller":
+                        category = MovieCategories.Thriller;
+                        break;
+                        default:
+                        return BadRequest("Category input must be: Horror, Action,Comdedy,Thriller");
+
+                }
+                var newMovie = new Movie
                 {
                     Id = Guid.NewGuid(),
                     CreatedAt = DateTime.UtcNow,
-                    Description = review.Description,
-                    Rating = review.Rating,
-                    UserID = review.UserID,
-                    User = user
+                    Name=movie.Name,
+                    Description = movie.Description,
+                    Category = category,
+                    Rating = 0
                 };
-                await unitOfWork.ReviewRepository.InsertReviewAsync(newReview);
+                await unitOfWork.MovieRepository.InsertMovieAsync(newMovie);
                 return Ok(await unitOfWork.SaveChangesAsync());
             }
             catch (Exception ex)
